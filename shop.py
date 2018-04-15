@@ -11,15 +11,21 @@ class Shop:
 	def __init__(self, master):
 		self.name = None
 		self.master = master
-		self.label = Label(master, text="Welecome!")
-		self.label.pack()
+		
+		welcome_canvas = Canvas(master,width=360,height=140)
+		welcome_canvas.config(bg="azure",bd=5,relief=RIDGE)
+		welcome_canvas.pack()
+		
+		welcome_canvas.create_text(180,70,fill="slate blue", text="WELCOME",font=("Times",48,"bold"))
 
-		self.enter_button = Button(master, text="Enter", command=self.enter)
-		self.enter_button.pack()
+		enter_button = Button(master,text="Enter", command=self.enter)
+		enter_button.config(width=360)
+		enter_button.pack()
 
-		self.login_button = Button(master, text="Shopkeeper Login", command=self.login)
-		self.login_button.pack()
-
+		login_button = Button(master, text="Shopkeeper Login", command=self.login)
+		login_button.config(width=360)
+		login_button.pack(side=BOTTOM)
+	
 	def __del__(self):
 		conn.close()
 	
@@ -48,6 +54,7 @@ class Shop:
 			b = Radiobutton(self.shopFrame, text=shop[0], variable=shopname,value=shop[0],indicatoron=0)
 			b.pack(fill=X)
 		self.proceed_button = Button(self.shopFrame, text="Proceed", command=lambda:self.proceed(shopname))
+		self.proceed_button.config(bg="green3")
 		self.proceed_button.pack(side=BOTTOM)
 		
 	def enter(self):
@@ -56,7 +63,8 @@ class Shop:
 		label_heading = Label(self.master,text="Menu")
 		label_heading.pack()
 		
-		self.menuFrame = Frame(self.master,relief=GROOVE,bd=1)
+		self.menuFrame = Frame(self.master)
+		self.menuFrame.config(width=360,relief=GROOVE,bd=1)
 		self.menuFrame.pack()
 		
 		if self.name != None:
@@ -327,6 +335,7 @@ class Shop:
 		
 		self.editFrame = Frame(self.master)
 		self.editFrame.pack()
+		self.editFrame.config(width=360)
 		
 		menubar = Menu(self.master)
 		self.master.master.config(menu=menubar)
@@ -353,13 +362,14 @@ class Shop:
 		self.master.master.title(self.name)
 		
 		self.orderFrame = Frame(self.master,relief=GROOVE)
+		self.orderFrame.config(width=360)
 		self.orderFrame.pack()
 		
 		label_test = Label(self.orderFrame,text="No Orders Yet")
 		label_test.pack()
 	
 root = Tk()
-root.geometry("640x480")
+root.geometry("360x560")
 root.title("Shop")
 mainFrame = Frame(root)
 mainFrame.pack()
