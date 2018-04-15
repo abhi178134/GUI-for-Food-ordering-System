@@ -117,7 +117,12 @@ class Shop:
 	def submit_order(self):
 		for widget in self.master.winfo_children():
 			widget.destroy()
-			
+		
+		shopname_canvas = Canvas(self.master,width=360,height=140)
+		shopname_canvas.pack()
+		shopname = self.name.replace("_"," ")
+		shopname_canvas.create_text(180,70,fill="royal blue", text=shopname,font=("Times",50-len(shopname),"bold"))
+		
 		self.orderFrame = Frame(self.master,relief=GROOVE)
 		self.orderFrame.pack()
 		label_name = Label(self.orderFrame,text="Food")
