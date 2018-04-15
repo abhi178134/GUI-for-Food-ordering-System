@@ -68,6 +68,6 @@ class Menu:
 		return string
 		
 	def display(self):
-		for food in (sorted(self.menu.values(), key=operator.attrgetter("rank"),reverse=True)):
+		for food in (sorted(self.menu.values(), key=operator.attrgetter("rank"))):
 			print(str(food))
 		

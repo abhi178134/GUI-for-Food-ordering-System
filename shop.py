@@ -106,6 +106,43 @@ class Shop:
 		if self.quantity[foodname] == 0:
 			self.order[foodname].set(0)
 
+	def submit_order(self):
+		for widget in self.master.winfo_children():
+			widget.destroy()
+			
+		self.orderFrame = Frame(self.master,relief=GROOVE)
+		self.orderFrame.pack()
+		label_name = Label(self.orderFrame,text="Food")
+		label_quantity = Label(self.orderFrame,text="Quanitity")
+		label_price = Label(self.orderFrame,text="Net Amount")
+		
+		label_name.grid(row=0,column=0)
+		label_quantity.grid(row=0,column=1)
+		label_price.grid(row=0,column=2)
+		
+		r=1
+		
+		for foodname in self.order.keys():
+			if self.quantity[foodname] > 0:
+				food = self.menu.get(foodname)
+				qnty = self.quantity[foodname]
+				
+				label_foodname = Label(self.orderFrame,text=foodname)
+				label_foodname.grid(row=r,column=0)
+				
+				label_qnty = Label(self.orderFrame,text=repr(qnty))
+				label_qnty.grid(row=r,column=1)
+				
+				cost = repr(food.price)+" X "+repr(qnty)+" = "+repr(food.price*qnty)+" Rs"
+				label_cost = Label(self.orderFrame,text=cost)
+				label_cost.grid(row=r,column=2)
+				
+				r += 1
+				
+		label_total_cost = Label(self.orderFrame,text="Total Amount to pay = "+repr(self.total_cost))
+		label_total_cost.grid(row=r,column=0,columnspan=3)
+		
+				
 	def interactiveOrder(self):
 		for widget in self.orderFrame.winfo_children():
 			widget.destroy()
@@ -145,8 +182,9 @@ class Shop:
 				r += 1
 		label_total_cost = Label(self.orderFrame,text="Total Cost = "+repr(self.total_cost))
 		label_total_cost.grid(row=r,column=0,columnspan=3)
-		scroll_order = Scrollbar(self.orderFrame)
-		scroll_order.grid(row=0,rowspan=100,column=5,sticky=E)	
+		
+		proceed_button = Button(self.orderFrame,text="Proceed",command=self.submit_order)
+		proceed_button.grid(columnspan=5)
 	
 	def interactiveMenu(self):
 		for widget in self.menuFrame.winfo_children():
@@ -168,8 +206,6 @@ class Shop:
 			label_price = Label(self.menuFrame,text=repr(food.price))
 			label_price.grid(row=r,column=1)
 			r += 1
-		scroll_menu = Scrollbar(self.menuFrame)
-		scroll_menu.grid(row=0,rowspan=r,column=3,sticky=E)
 	
 	def displayMenu(self):
 		for widget in self.menuFrame.winfo_children():
@@ -179,14 +215,12 @@ class Shop:
 		label_name.grid(row=0,column=0)
 		label_price.grid(row=0,column=1)
 		r = 1
-		for food in (sorted(self.menu.menu.values(), key=operator.attrgetter("rank"),reverse=True)):
+		for food in (sorted(self.menu.menu.values(), key=operator.attrgetter("rank"))):
 			label_name = Label(self.menuFrame,text=food.name)
 			label_price = Label(self.menuFrame,text=repr(food.price))
 			label_name.grid(row=r,column=0)
 			label_price.grid(row=r,column=1)
 			r += 1
-		scroll_menu = Scrollbar(self.menuFrame,)
-		scroll_menu.grid(row=0,rowspan=r,column=3)
 
 	def click_add(self):
 		name = self.entry_foodname.get()
@@ -291,7 +325,7 @@ class Shop:
 	def shopkeeper(self):
 		self.master.master.title(self.name)
 		
-		self.editFrame = Frame(self.master.master)
+		self.editFrame = Frame(self.master)
 		self.editFrame.pack()
 		
 		menubar = Menu(self.master)
@@ -318,7 +352,7 @@ class Shop:
 	def customer(self):
 		self.master.master.title(self.name)
 		
-		self.orderFrame = Frame(self.master.master,relief=GROOVE)
+		self.orderFrame = Frame(self.master,relief=GROOVE)
 		self.orderFrame.pack()
 		
 		label_test = Label(self.orderFrame,text="No Orders Yet")
