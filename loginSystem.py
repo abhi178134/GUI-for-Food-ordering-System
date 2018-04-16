@@ -14,14 +14,13 @@ class LoginPage():
 		master.entry_username.grid(row=0,column=1)
 		
 		master.label_password = Label(master, text="Password")
-		master.entry_password = Entry(master)
+		master.entry_password = Entry(master, show="•")
 		master.label_password.grid(row=1,column=0,sticky=E)
 		master.entry_password.grid(row=1,column=1)
 		
 		login_button = Button(master,text="Login",command=lambda:self.validate(master.entry_username.get(),master.entry_password.get()))
 		login_button.grid(columnspan=2)
 		
-		label_register = Label(master,text="New User?click here to login")
 		register_button = Button(master,text="Register",command=self.register)
 		register_button.grid(columnspan=2)
 	
