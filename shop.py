@@ -86,7 +86,9 @@ class Shop:
 		foods = curs.fetchall()
 		for values in foods:
 			food = foodmenu.Food(*values)
+		
 			self.menu.add(food)
+		self.menu.reduceRanks()
 	
 	def clearEditFrame(self):
 		for widget in self.editFrame.winfo_children():
@@ -136,9 +138,9 @@ class Shop:
 		r=1
 		
 		for foodname in self.order.keys():
-			if self.quantity[foodname] > 0:
-				food = self.menu.get(foodname)
-				qnty = self.quantity[foodname]
+			food = self.menu.get(foodname)
+			qnty = self.quantity[foodname]
+			if qnty > 0:
 				
 				label_foodname = Label(self.orderFrame,text=foodname)
 				label_foodname.grid(row=r,column=0)
@@ -151,6 +153,10 @@ class Shop:
 				label_cost.grid(row=r,column=2)
 				
 				r += 1
+			
+			sqlQuery = "UPDATE "+self.name+"_menu SET rank="+repr(food.rank+qnty)+" WHERE food="+repr(food.name)
+			curs.execute(sqlQuery)
+			conn.commit()
 				
 		label_total_cost = Label(self.orderFrame,text="Total Amount to pay = "+repr(self.total_cost))
 		label_total_cost.grid(row=r,column=0,columnspan=3)
@@ -228,7 +234,7 @@ class Shop:
 		label_name.grid(row=0,column=0)
 		label_price.grid(row=0,column=1)
 		r = 1
-		for food in (sorted(self.menu.menu.values(), key=operator.attrgetter("rank"))):
+		for food in (sorted(self.menu.menu.values(), key=operator.attrgetter("rank"),reverse=True)):
 			label_name = Label(self.menuFrame,text=food.name)
 			label_price = Label(self.menuFrame,text=repr(food.price))
 			label_name.grid(row=r,column=0)

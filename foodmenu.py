@@ -58,6 +58,12 @@ class Menu:
 			print("No food with name ",name)
 			return KeyError
 
+	def reduceRanks(self):
+		minRank = min([food.rank for food in self.menu.values()])
+		for name in self.menu.keys():
+			self.menu[name].rank -= minRank
+		print("reduced ranks of all foods by ",minRank)
+		
 	def __str__(self):
 		string = ""
 		for key in self.menu.keys():
@@ -68,6 +74,6 @@ class Menu:
 		return string
 		
 	def display(self):
-		for food in (sorted(self.menu.values(), key=operator.attrgetter("rank"))):
+		for food in (sorted(self.menu.values(), key=operator.attrgetter("rank"),reverse=True)):
 			print(str(food))
 		
