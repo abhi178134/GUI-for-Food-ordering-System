@@ -3,6 +3,7 @@ import foodmenu
 import loginSystem
 import pymysql
 import operator
+import datetime
 
 conn = pymysql.connect(host="localhost",user="root",password="root123",db="foodmenu")
 curs = conn.cursor()
@@ -28,6 +29,28 @@ class Shop:
 	
 	def __del__(self):
 		conn.close()
+		
+	def login(self):
+		loginWin = Toplevel(self.master)
+		loginPage = loginSystem.LoginPage(loginWin,self)
+		
+	def enter(self):
+		for widget in self.master.winfo_children():
+			widget.destroy()
+		label_heading = Label(self.master,text="Menu")
+		label_heading.pack()
+		
+		self.menuFrame = Frame(self.master)
+		self.menuFrame.config(width=360,relief=GROOVE,bd=1)
+		self.menuFrame.pack()
+		
+		if self.name != None:
+			self.name = self.name.replace(" ","_")
+			self.shopkeeper()
+			self.getMenu()
+			self.displayMenu()
+		else:
+			self.displayShops()
 	
 	def proceed(self,shopname):
 		self.name = shopname.get()
@@ -56,28 +79,6 @@ class Shop:
 		self.proceed_button = Button(self.shopFrame, text="Proceed", command=lambda:self.proceed(shopname))
 		self.proceed_button.config(bg="green3")
 		self.proceed_button.pack(side=BOTTOM)
-		
-	def enter(self):
-		for widget in self.master.winfo_children():
-			widget.destroy()
-		label_heading = Label(self.master,text="Menu")
-		label_heading.pack()
-		
-		self.menuFrame = Frame(self.master)
-		self.menuFrame.config(width=360,relief=GROOVE,bd=1)
-		self.menuFrame.pack()
-		
-		if self.name != None:
-			self.name = self.name.replace(" ","_")
-			self.shopkeeper()
-			self.getMenu()
-			self.displayMenu()
-		else:
-			self.displayShops()
-
-	def login(self):
-		loginWin = Toplevel(self.master)
-		loginPage = loginSystem.LoginPage(loginWin,self)
 	
 	def getMenu(self):
 		self.menu = foodmenu.Menu()
@@ -86,7 +87,6 @@ class Shop:
 		foods = curs.fetchall()
 		for values in foods:
 			food = foodmenu.Food(*values)
-		
 			self.menu.add(food)
 		self.menu.reduceRanks()
 	
@@ -115,52 +115,6 @@ class Shop:
 			self.interactiveOrder()
 		if self.quantity[foodname] == 0:
 			self.order[foodname].set(0)
-
-	def submit_order(self):
-		for widget in self.master.winfo_children():
-			widget.destroy()
-		
-		shopname_canvas = Canvas(self.master,width=360,height=140)
-		shopname_canvas.pack()
-		shopname = self.name.replace("_"," ")
-		shopname_canvas.create_text(180,70,fill="royal blue", text=shopname,font=("Times",50-len(shopname),"bold"))
-		
-		self.orderFrame = Frame(self.master,relief=GROOVE)
-		self.orderFrame.pack()
-		label_name = Label(self.orderFrame,text="Food")
-		label_quantity = Label(self.orderFrame,text="Quanitity")
-		label_price = Label(self.orderFrame,text="Net Amount")
-		
-		label_name.grid(row=0,column=0)
-		label_quantity.grid(row=0,column=1)
-		label_price.grid(row=0,column=2)
-		
-		r=1
-		
-		for foodname in self.order.keys():
-			food = self.menu.get(foodname)
-			qnty = self.quantity[foodname]
-			if qnty > 0:
-				
-				label_foodname = Label(self.orderFrame,text=foodname)
-				label_foodname.grid(row=r,column=0)
-				
-				label_qnty = Label(self.orderFrame,text=repr(qnty))
-				label_qnty.grid(row=r,column=1)
-				
-				cost = repr(food.price)+" X "+repr(qnty)+" = "+repr(food.price*qnty)+" Rs"
-				label_cost = Label(self.orderFrame,text=cost)
-				label_cost.grid(row=r,column=2)
-				
-				r += 1
-			
-			sqlQuery = "UPDATE "+self.name+"_menu SET rank="+repr(food.rank+qnty)+" WHERE food="+repr(food.name)
-			curs.execute(sqlQuery)
-			conn.commit()
-				
-		label_total_cost = Label(self.orderFrame,text="Total Amount to pay = "+repr(self.total_cost))
-		label_total_cost.grid(row=r,column=0,columnspan=3)
-		
 				
 	def interactiveOrder(self):
 		for widget in self.orderFrame.winfo_children():
@@ -241,6 +195,59 @@ class Shop:
 			label_price.grid(row=r,column=1)
 			r += 1
 
+	def submit_order(self):
+		for widget in self.master.winfo_children():
+			widget.destroy()
+		
+		shopname_canvas = Canvas(self.master,width=360,height=140)
+		shopname_canvas.pack()
+		shopname = self.name.replace("_"," ")
+		shopname_canvas.create_text(180,70,fill="royal blue", text=shopname,font=("Times",50-len(shopname),"bold"))
+		
+		self.orderFrame = Frame(self.master,relief=GROOVE)
+		self.orderFrame.pack()
+		label_name = Label(self.orderFrame,text="Food")
+		label_quantity = Label(self.orderFrame,text="Quanitity")
+		label_price = Label(self.orderFrame,text="Net Amount")
+		
+		label_name.grid(row=0,column=0)
+		label_quantity.grid(row=0,column=1)
+		label_price.grid(row=0,column=2)
+		
+		r=1
+		
+		for foodname in self.order.keys():
+			food = self.menu.get(foodname)
+			qnty = self.quantity[foodname]
+			if qnty > 0:
+				
+				label_foodname = Label(self.orderFrame,text=foodname)
+				label_foodname.grid(row=r,column=0)
+				
+				label_qnty = Label(self.orderFrame,text=repr(qnty))
+				label_qnty.grid(row=r,column=1)
+				
+				cost = repr(food.price)+" X "+repr(qnty)+" = "+repr(food.price*qnty)+" Rs"
+				label_cost = Label(self.orderFrame,text=cost)
+				label_cost.grid(row=r,column=2)
+				
+				r += 1
+			
+			sqlQuery = "UPDATE "+self.name+"_menu SET rank="+repr(food.rank+qnty)+" WHERE food="+repr(food.name)
+			curs.execute(sqlQuery)
+			conn.commit()
+		
+		detailsFrame = Frame(self.master,pady=10)
+		detailsFrame.pack()
+		
+		label_total_cost = Label(detailsFrame,text="Total Amount to pay = "+repr(self.total_cost))
+		label_total_cost.grid(row=r,column=0,columnspan=3)
+		
+		now = datetime.datetime.now()
+		label_datetime = Label(detailsFrame,text=now.strftime("%d-%m-%Y   %H:%M"))
+		label_datetime.grid(row=r+1,column=0,columnspan=3)
+		
+			
 	def click_add(self):
 		name = self.entry_foodname.get()
 		price = float(self.entry_foodprice.get())
@@ -331,20 +338,11 @@ class Shop:
 		
 		clear_button = Button(master,text="Clear All",command=self.click_clear)
 		clear_button.grid(row=1,columnspan=2)
-	
-	def savemenu(self):
-		sqlQuery = "DELETE FROM "+self.name+"_menu"
-		curs.execute(sqlQuery)
-		for food in self.menu.menu.values():
-			sqlQuery = "INSERT INTO "+self.name+"_menu VALUES("+repr(food.name)+", "+repr(food.price)+", "+repr(food.rank)+");" 
-			curs.execute(sqlQuery)
-		conn.commit()
-		print("Menu Updated")	
 
 	def shopkeeper(self):
 		self.master.master.title(self.name)
 		
-		self.editFrame = Frame(self.master)
+		self.editFrame = Frame(self.master,pady=10)
 		self.editFrame.pack()
 		self.editFrame.config(width=360)
 		
@@ -372,12 +370,21 @@ class Shop:
 	def customer(self):
 		self.master.master.title(self.name)
 		
-		self.orderFrame = Frame(self.master,relief=GROOVE)
+		self.orderFrame = Frame(self.master,relief=GROOVE,pady=10)
 		self.orderFrame.config(width=360)
 		self.orderFrame.pack()
 		
 		label_test = Label(self.orderFrame,text="No Orders Yet")
 		label_test.pack()
+		
+	def savemenu(self):
+		sqlQuery = "DELETE FROM "+self.name+"_menu"
+		curs.execute(sqlQuery)
+		for food in self.menu.menu.values():
+			sqlQuery = "INSERT INTO "+self.name+"_menu VALUES("+repr(food.name)+", "+repr(food.price)+", "+repr(food.rank)+");" 
+			curs.execute(sqlQuery)
+		conn.commit()
+		print("Menu Updated")	
 	
 root = Tk()
 root.geometry("360x560")
