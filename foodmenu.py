@@ -59,7 +59,10 @@ class Menu:
 			return KeyError
 
 	def reduceRanks(self):
-		minRank = min([food.rank for food in self.menu.values()])
+		try:
+			minRank = min([food.rank for food in self.menu.values()])
+		except:
+			minRank = 0
 		for name in self.menu.keys():
 			self.menu[name].rank -= minRank
 		print("reduced ranks of all foods by ",minRank)

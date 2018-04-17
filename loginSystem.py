@@ -16,8 +16,6 @@ except:
 	conn = pymysql.connect(host="localhost",user=mysql_user,password=mysql_pass,db="foodmenu")
 	curs = conn.cursor()
 	try:
-		sqlQuery = "CREATE DATABASE foodmenu;"
-		curs.execute()
 		sqlQuery = "USE foodmenu;"
 		curs.execute()
 		sqlQuery = "CREATE TABLE login_details(username varchar(30) primary key, shopname varchar(50), password varchar(50));"
@@ -70,19 +68,16 @@ class LoginPage():
 		shopname = self.master.entry_shopname.get()
 		password = self.master.entry_password.get()
 		sqlQuery = "INSERT INTO login_details VALUES("+repr(username)+", "+repr(shopname)+", "+repr(password)+")"
-		try:
-			curs.execute(sqlQuery)
-			shopname = shopname.replace(" ","_")
-			sqlQuery = "CREATE TABLE "+shopname+"_menu(food varchar(20) primary key, price REAL, rank INTEGER)"
-			curs.execute(sqlQuery)
-			conn.commit()
-			self.shop.name = shopname
-			print("Registration Successful")
-			conn.close()
-			self.master.destroy()
-			self.shop.enter()
-		except:
-			print("user already exists")
+		curs.execute(sqlQuery)
+		shopname = shopname.replace(" ","_")
+		sqlQuery = "CREATE TABLE "+shopname+"_menu(food varchar(20) primary key, price REAL, rank INTEGER)"
+		curs.execute(sqlQuery)
+		conn.commit()
+		self.shop.name = shopname
+		print("Registration Successful")
+		conn.close()
+		self.master.destroy()
+		self.shop.enter()
 
 	def register(self):		
 		for widget in self.master.winfo_children():
