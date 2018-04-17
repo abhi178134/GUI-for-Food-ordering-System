@@ -4,6 +4,8 @@ import loginSystem
 import pymysql
 import operator
 import datetime
+import webbrowser
+
 
 conn = pymysql.connect(host="localhost",user="root",password="root123",db="foodmenu")
 curs = conn.cursor()
@@ -14,22 +16,27 @@ class Shop:
 		self.master = master
 		
 		welcome_canvas = Canvas(master,width=360,height=140)
-		welcome_canvas.config(bg="azure",bd=5,relief=RIDGE)
 		welcome_canvas.pack()
-		
 		welcome_canvas.create_text(180,70,fill="slate blue", text="WELCOME",font=("Times",48,"bold"))
-
+		
 		enter_button = Button(master,text="Enter", command=self.enter)
-		enter_button.config(width=360)
+		enter_button.config(width=360,pady=135,bd=5,fg="green",relief=GROOVE,font="SNAS 40")
 		enter_button.pack()
 
 		login_button = Button(master, text="Shopkeeper Login", command=self.login)
 		login_button.config(width=360)
-		login_button.pack(side=BOTTOM)
+		login_button.pack()
+	
+		label_credits = Label(master,text="Icon made by Freepik from www.flaticon.com",fg="blue",cursor="hand2")
+		label_credits.pack()
+		label_credits.bind("<Button-1>",self.credit_link)
 	
 	def __del__(self):
 		conn.close()
-		
+	
+	def credit_link(self,event):
+		webbrowser.open_new(r"https://www.flaticon.com/authors/freepik")
+	
 	def login(self):
 		loginWin = Toplevel(self.master)
 		loginPage = loginSystem.LoginPage(loginWin,self)
@@ -389,6 +396,7 @@ class Shop:
 root = Tk()
 root.geometry("360x560")
 root.title("Shop")
+root.iconbitmap("dish.ico")
 mainFrame = Frame(root)
 mainFrame.pack()
 shopWindow = Shop(mainFrame)
