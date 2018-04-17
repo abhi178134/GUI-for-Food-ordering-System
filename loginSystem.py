@@ -1,8 +1,31 @@
 import pymysql
 from tkinter import *
 
-conn = pymysql.connect(host="localhost",user="root",password="root123",db="foodmenu")
-curs = conn.cursor()
+try:
+	fp = open("database_details.txt","r")
+	mysql_user, mysql_pass = fp.read().split(" ")
+	print(mysql_user,"->",mysql_pass)
+	conn = pymysql.connect(host="localhost",user=mysql_user,password=mysql_pass,db="foodmenu")
+	curs = conn.cursor()
+	
+except:
+	mysql_user=input("enter root username for mysql: ")
+	mysql_pass=input("enter root password for mysql: ")
+	fp = open("database_details.txt","w")
+	fp.writelines([mysql_user," ",mysql_pass])
+	conn = pymysql.connect(host="localhost",user=mysql_user,password=mysql_pass,db="foodmenu")
+	curs = conn.cursor()
+	try:
+		sqlQuery = "CREATE DATABASE foodmenu;"
+		curs.execute()
+		sqlQuery = "USE foodmenu;"
+		curs.execute()
+		sqlQuery = "CREATE TABLE login_details(username varchar(30) primary key, shopname varchar(50), password varchar(50));"
+		curs.execute()
+		conn.commit()
+	except:
+		print("Unable to create database")
+		pass
 
 class LoginPage():
 	def __init__(self, master,shop):
